@@ -1,2 +1,2 @@
 # Terrain-Pathfinding
-This program can find the most energy efficient path between two points given a topographic map
+Want to know the easiest way to get somewhere? Simply upload a topographic map and this program will show you!
