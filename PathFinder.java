@@ -1,28 +1,6 @@
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
-//input: input.bmp terrain
-//output: output.png
-
-/*
- * read in image convert to array
- * 
- * decide where to build
- * 
- * make cost array from city's edge while checking for obstructions create 2d
- * array cost and arraylist stack add all px on city edge to stack and set
- * values in cost array to 0 set all other costs to infinity check surroundings,
- * calculate value, add surrounding px to stack if not obstructions or edges,
- * remove tested px from stack repeat until no more in stack
- * 
- * find lowest cost for each city use known city loc to get city edge compare
- * cost on edge of city
- * 
- * pick three lowest costs
- * 
- * build roads to chosen cities read out image
- */
-
 public class PathFinder {
 	
 	private static int inputHeight;
@@ -31,7 +9,14 @@ public class PathFinder {
 	private static double[][] costMap;
 	private static BufferedImage bestRoute;
 	
-	
+	/* uses Dijkstra's pathfinding algorithm to find most efficient route across terrain
+	 * @param terrainImg topographic map of terrain
+	 * @param startX x-coordinate of starting location
+	 * @param startY y-coordinate of starting location
+	 * @param endX x-coordinate of ending location
+	 * @param endY y-coordinate of ending location
+	 * @return image of terrain with the most efficient path between specified points marked in green
+	 */
 	public static BufferedImage findBestRoute(BufferedImage terrainImg, int startX, int startY, int endX, int endY) {
 
 		inputHeight = terrainImg.getHeight();
