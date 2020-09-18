@@ -23,7 +23,6 @@ public class PathFinder {
 		inputWidth = terrainImg.getWidth();
 		terrain = new int[inputHeight][inputWidth]; //stores image values so easier to access
 		costMap = new double[inputHeight][inputWidth]; // stores cost
-		bestRoute = new BufferedImage(inputHeight, inputWidth, BufferedImage.TYPE_4BYTE_ABGR);
 		
 		// sets costMap entries to Double.MAX_VALUE and copies terrainImg to terrain[][]
 		for (int x = 0; x < inputWidth; x++) {
@@ -37,8 +36,7 @@ public class PathFinder {
 		LinkedList<Integer[]> queue = new LinkedList<Integer[]>();
 
 		// add starting x and y to stack
-		Integer[] startingCoordinates = {startY, startX};
-		queue.add(startingCoordinates);
+		queue.add({startY, startX});
 		
 
 		// compute cost array
@@ -71,23 +69,38 @@ public class PathFinder {
 			
 		}
 		
-		
-		
 		//copy terrainImg to bestRoute
-		for(int i = 0; i < inputHeight; i++) {
-			for(int j = 0; j < inputWidth; j++) {
-				setBWPixel(bestRoute, i, j, terrainImg.getRGB(j,i));
+		bestRoute = copyBufferedImage(terrainImg);
+		
+		// mark best route in green
+		bestRoute = markBestRoute(bestRoute);
+		
+		return bestRoute;
+	}
+
+	private static BufferedImage copyBufferedImage(BufferedImage image, int height, int width){
+		BufferedImage output = new BufferedImage(height, width, BufferedImage.TYPE_4BYTE_ABGR);
+
+		for(int i = 0; i < height; i++) {
+			for(int j = 0; j < width; j++) {
+				setBWPixel(output, i, j, image.getRGB(j,i));
 			}
 		}
+	}
+
+	private static BufferedImage markBestRoute(BufferedImage image, double[][] costMap, int endX, int endY){
+		/*
+		given an image, ending coordinates, and a costMap computed from starting coordinates, 
+		mark the most cost efficient route from start to end in green
+		*/
 		
-		
-		// traceback path and mark on bestRoute image
+		// traceback path
 		int x = endX;
 		int y = endY;
 		double minCost = costMap[y][x];
 		
 		// mark ending square
-		setGreenPixel(bestRoute, y, x, 255);
+		setGreenPixel(image, y, x, 255);
 
 		while(minCost != 0) {
 
@@ -101,13 +114,11 @@ public class PathFinder {
 			minCost = costMap[y][x];
 	
 			// mark new square
-			setGreenPixel(bestRoute, y, x, 255);
+			setGreenPixel(image, y, x, 255);
 		}
-		
-		
-		return bestRoute;
-	}
 
+		return image;
+	}
 	
 	// checks if coordinate plus adjustment is out of bounds 
 	private static boolean outOfBounds(int y, int x) {
@@ -120,9 +131,7 @@ public class PathFinder {
 
 	// compute the cost to move from (y, x) to (y + i, x + j)
 	private static double computeCostOfMovement(int y, int x, int i, int j) {
-
 		return Double.valueOf((Math.pow((i * i + j * j), 0.5)) + Math.pow((terrain[y][x] - terrain[y + i][x + j]), 2));
-		
 	}
 
 	// sets specified pixel in specified image to a grayscale value
@@ -147,19 +156,20 @@ public class PathFinder {
 		// find lowest surrounding cost
 		for(int i = -1; i < 2; i++) {
 			for(int j = -1; j < 2; j++) {
-				if(outOfBounds(y + i, x + j)) {
+				int testX = x + j;
+				int testY = y + i;
+				if(outOfBounds(testY, testX)) {
 					continue;
-				}else if(costMap[y + i][x + j] < minCost) {
-					minY = y + i;
-					minX = x + j;
-					minCost = costMap[y + i][x + j];
+				}else if(costMap[testY][testX] < minCost) {
+					minY = testY;
+					minX = testX;
+					minCost = costMap[testY][testX];
 				}
 			}
 		}
 		
-		int[] lowestCostCoordinates = {minY, minX};
+		return { minY, minX };
 		
-		return lowestCostCoordinates;
 	}
 	
 }
